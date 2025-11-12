@@ -1,0 +1,2 @@
+ALTER TABLE tasks
+ADD COLUMN project_id SERIAL NOT NULL REFERENCES projects(id);
