@@ -10,7 +10,6 @@ import java.time.LocalDate;
 @Entity(name = "projects")
 @Table(name = "projects")
 @Data
-@EntityListeners(AuditingEntityListener.class)
 public class Project {
 
     @Id
@@ -23,7 +22,6 @@ public class Project {
     @Column(name = "description")
     private String description;
 
-    @CreatedDate
     @Column(name = "start_date")
     private LocalDate startDate;
 
