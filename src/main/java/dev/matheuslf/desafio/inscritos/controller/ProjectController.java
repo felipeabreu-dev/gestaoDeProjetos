@@ -1,15 +1,15 @@
 package dev.matheuslf.desafio.inscritos.controller;
 
 import dev.matheuslf.desafio.inscritos.controller.dto.ProjectRequestDTO;
+import dev.matheuslf.desafio.inscritos.controller.dto.ProjectResponseDTO;
 import dev.matheuslf.desafio.inscritos.service.ProjectService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/projects")
@@ -22,6 +22,12 @@ public class ProjectController {
     public ResponseEntity<Void> createProject(@RequestBody @Valid ProjectRequestDTO dto) {
         projectService.createProject(dto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ProjectResponseDTO>> getProjects() {
+        List<ProjectResponseDTO> projects = projectService.getProjects();
+        return ResponseEntity.status(HttpStatus.OK).body(projects);
     }
 
 }
