@@ -3,12 +3,13 @@ package dev.matheuslf.desafio.inscritos.service;
 import dev.matheuslf.desafio.inscritos.controller.dto.TaskRequestDTO;
 import dev.matheuslf.desafio.inscritos.controller.dto.TaskResponseDTO;
 import dev.matheuslf.desafio.inscritos.controller.dto.TaskUpdateRequestDTO;
+import dev.matheuslf.desafio.inscritos.exception.ProjectNonExistsException;
+import dev.matheuslf.desafio.inscritos.exception.TaskNonExistsException;
 import dev.matheuslf.desafio.inscritos.mapper.TaskMapper;
 import dev.matheuslf.desafio.inscritos.model.Project;
 import dev.matheuslf.desafio.inscritos.model.Task;
 import dev.matheuslf.desafio.inscritos.model.enums.TaskPriority;
 import dev.matheuslf.desafio.inscritos.model.enums.TaskStatus;
-import dev.matheuslf.desafio.inscritos.repository.ProjectRepository;
 import dev.matheuslf.desafio.inscritos.repository.TaskRepository;
 import dev.matheuslf.desafio.inscritos.repository.specs.TaskSpecs;
 import lombok.RequiredArgsConstructor;
@@ -24,14 +25,14 @@ import static dev.matheuslf.desafio.inscritos.repository.specs.TaskSpecs.*;
 public class TaskService {
 
     private final TaskRepository taskRepository;
-    private final ProjectRepository projectRepository;
+    private final ProjectService projectService;
     private final TaskMapper mapper;
 
     public void createTask(TaskRequestDTO dto) {
-        if(!projectRepository.existsById(dto.projectId())) throw new IllegalArgumentException("Projeto não existe");
+        if (!projectService.existsProjectById(dto.projectId())) throw new ProjectNonExistsException("Projeto não encontrado");
 
         Task task = mapper.toEntity(dto);
-        task.setProjectId(projectRepository.findById(dto.projectId()).get());
+        task.setProjectId(projectService.findProjectById(dto.projectId()));
         taskRepository.save(task);
     }
 
@@ -48,7 +49,7 @@ public class TaskService {
         }
 
         if(projectId != null) {
-            Project project = getProjectById(projectId);
+            Project project = projectService.findProjectById(projectId);
             specs = specs.and(TaskSpecs.projectIdEqual(project));
         }
 
@@ -59,9 +60,9 @@ public class TaskService {
     }
 
     public TaskResponseDTO updateTaskStatus(Long id, TaskUpdateRequestDTO dto) {
-        if (!taskRepository.existsById(id)) throw new RuntimeException();
+        if (!taskRepository.existsById(id)) throw new TaskNonExistsException("Task não encontrada");
 
-        Task task = taskRepository.findById(id).get();
+        Task task = this.findTaskById(id);
         task.setStatus(dto.status());
         taskRepository.save(task);
 
@@ -69,12 +70,13 @@ public class TaskService {
     }
 
     public void deleteTask(Long id) {
-        if(!taskRepository.existsById(id)) throw new RuntimeException();
+        if(!taskRepository.existsById(id)) throw new TaskNonExistsException("Task não encontrada");
         taskRepository.deleteById(id);
     }
 
-    Project getProjectById(Long id) {
-        return projectRepository.findById(id).get();
+    public Task findTaskById(Long id) {
+        return taskRepository.findById(id)
+                .orElseThrow(() -> new TaskNonExistsException("Task não encontrada"));
     }
 
 }
