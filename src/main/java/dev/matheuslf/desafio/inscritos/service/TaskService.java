@@ -1,12 +1,22 @@
 package dev.matheuslf.desafio.inscritos.service;
 
 import dev.matheuslf.desafio.inscritos.controller.dto.TaskRequestDTO;
+import dev.matheuslf.desafio.inscritos.controller.dto.TaskResponseDTO;
 import dev.matheuslf.desafio.inscritos.mapper.TaskMapper;
+import dev.matheuslf.desafio.inscritos.model.Project;
 import dev.matheuslf.desafio.inscritos.model.Task;
+import dev.matheuslf.desafio.inscritos.model.enums.TaskPriority;
+import dev.matheuslf.desafio.inscritos.model.enums.TaskStatus;
 import dev.matheuslf.desafio.inscritos.repository.ProjectRepository;
 import dev.matheuslf.desafio.inscritos.repository.TaskRepository;
+import dev.matheuslf.desafio.inscritos.repository.specs.TaskSpecs;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+import static dev.matheuslf.desafio.inscritos.repository.specs.TaskSpecs.*;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +32,33 @@ public class TaskService {
         Task task = mapper.toEntity(dto);
         task.setProjectId(projectRepository.findById(dto.projectId()).get());
         taskRepository.save(task);
+    }
+
+    public List<TaskResponseDTO> getTasks(TaskStatus status, TaskPriority priority, Long projectId) {
+
+        Specification<Task> specs = (root, query, cb) -> cb.conjunction();
+
+        if(status != null) {
+            specs = specs.and(statusEqual(status));
+        }
+
+        if(priority != null) {
+            specs = specs.and(priorityEqual(priority));
+        }
+
+        if(projectId != null) {
+            Project project = getProjectById(projectId);
+            specs = specs.and(TaskSpecs.projectIdEqual(project));
+        }
+
+        return taskRepository.findAll(specs)
+                .stream()
+                .map(mapper::toDTO)
+                .toList();
+    }
+
+    Project getProjectById(Long id) {
+        return projectRepository.findById(id).get();
     }
 
 }
