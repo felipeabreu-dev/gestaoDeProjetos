@@ -2,6 +2,7 @@ package dev.matheuslf.desafio.inscritos.service;
 
 import dev.matheuslf.desafio.inscritos.controller.dto.TaskRequestDTO;
 import dev.matheuslf.desafio.inscritos.controller.dto.TaskResponseDTO;
+import dev.matheuslf.desafio.inscritos.controller.dto.TaskUpdateRequestDTO;
 import dev.matheuslf.desafio.inscritos.mapper.TaskMapper;
 import dev.matheuslf.desafio.inscritos.model.Project;
 import dev.matheuslf.desafio.inscritos.model.Task;
@@ -55,6 +56,16 @@ public class TaskService {
                 .stream()
                 .map(mapper::toDTO)
                 .toList();
+    }
+
+    public TaskResponseDTO updateTaskStatus(Long id, TaskUpdateRequestDTO dto) {
+        if (!taskRepository.existsById(id)) throw new RuntimeException();
+
+        Task task = taskRepository.findById(id).get();
+        task.setStatus(dto.status());
+        taskRepository.save(task);
+
+        return mapper.toDTO(task);
     }
 
     Project getProjectById(Long id) {

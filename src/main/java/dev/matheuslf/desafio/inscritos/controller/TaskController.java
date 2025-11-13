@@ -2,6 +2,7 @@ package dev.matheuslf.desafio.inscritos.controller;
 
 import dev.matheuslf.desafio.inscritos.controller.dto.TaskRequestDTO;
 import dev.matheuslf.desafio.inscritos.controller.dto.TaskResponseDTO;
+import dev.matheuslf.desafio.inscritos.controller.dto.TaskUpdateRequestDTO;
 import dev.matheuslf.desafio.inscritos.model.enums.TaskPriority;
 import dev.matheuslf.desafio.inscritos.model.enums.TaskStatus;
 import dev.matheuslf.desafio.inscritos.service.TaskService;
@@ -34,6 +35,12 @@ public class TaskController {
     ) {
         List<TaskResponseDTO> tasks = taskService.getTasks(status, priority, projectId);
         return ResponseEntity.status(HttpStatus.OK).body(tasks);
+    }
+
+    @PutMapping("{id}/status")
+    public ResponseEntity<TaskResponseDTO> updateTaskStatus(@PathVariable Long id, @RequestBody @Valid TaskUpdateRequestDTO dto) {
+        TaskResponseDTO responseDTO = taskService.updateTaskStatus(id, dto);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
     }
 
 }
