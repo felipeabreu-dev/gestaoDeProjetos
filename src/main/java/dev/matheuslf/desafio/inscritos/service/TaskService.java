@@ -68,6 +68,11 @@ public class TaskService {
         return mapper.toDTO(task);
     }
 
+    public void deleteTask(Long id) {
+        if(!taskRepository.existsById(id)) throw new RuntimeException();
+        taskRepository.deleteById(id);
+    }
+
     Project getProjectById(Long id) {
         return projectRepository.findById(id).get();
     }
