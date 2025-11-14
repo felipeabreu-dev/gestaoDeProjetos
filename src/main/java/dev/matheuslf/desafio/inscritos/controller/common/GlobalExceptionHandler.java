@@ -1,5 +1,6 @@
 package dev.matheuslf.desafio.inscritos.controller.common;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import dev.matheuslf.desafio.inscritos.controller.dto.ErrorResponseDTO;
 import dev.matheuslf.desafio.inscritos.exception.ProjectNonExistsException;
 import dev.matheuslf.desafio.inscritos.exception.TaskNonExistsException;
@@ -39,5 +40,10 @@ public class GlobalExceptionHandler {
                 "Erro de requisição, verifique os dados"
         );
         return error;
+    }
+
+    @ExceptionHandler(JWTVerificationException.class)
+    public String jwtVerificationExceptionHandler(JWTVerificationException e) {
+        return "";
     }
 }
